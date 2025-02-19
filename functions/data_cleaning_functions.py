@@ -1,8 +1,6 @@
-# include type hints
-# create a function that returns the specified column to a list of unique values with their value counts
-
 import pandas as pd
-
+import numpy as np
+from typing import List
 
 def display_unique_counts(df: pd.DataFrame) -> None:
     """
@@ -45,6 +43,110 @@ def test_ticker(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
 import pandas as pd
 
 
+def tickers_with_multiple_companies(df: pd.DataFrame) -> list:
+    """
+    Identifies tickers associated with multiple companies in the given DataFrame.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame containing 'ticker' and 'comp_name' columns.
+
+    Returns:
+    list: A list of strings, where each string contains a ticker and the associated companies.
+    """
+
+    # Group by ticker and count unique company names for each ticker
+    companies_per_ticker_df = (
+        df.groupby("ticker")["comp_name"].nunique().sort_values(ascending=False)
+    )
+
+    tickers_with_multiple_companies_index = companies_per_ticker_df[
+        companies_per_ticker_df > 1
+    ].index
+
+    # Get DataFrame of tickers with multiple companies
+    tickers_multi_comp_df = df[df["ticker"].isin(tickers_with_multiple_companies_index)]
+
+    # Build the list of tickers and associated companies
+    tickers_multi_comp_list = []
+    for ticker, other_cols in tickers_multi_comp_df.groupby("ticker"):
+        companies = ", ".join(sorted(other_cols["comp_name"].unique()))
+        tickers_multi_comp_list.append(f"{ticker}: {companies}")
+
+    print(
+        "Tickers associated with multiple companies: ",
+        len(tickers_with_multiple_companies_index),
+        end="\n\n",
+    )
+
+    return tickers_multi_comp_list
+
+
+def apply_most_recent_company_name(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Updates the 'comp_name' column in the DataFrame to use the most recent company name for each ticker.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame containing 'ticker', 'year', and 'comp_name' columns.
+
+    Returns:
+    pd.DataFrame: A DataFrame with the 'comp_name' column updated based on the latest year for each ticker.
+    """
+
+    # Sort by ticker (alphabetically) and year (descending) to get the latest company name per ticker
+    ticker_latest_company_df = df.sort_values(
+        by=["ticker", "year"], ascending=[True, False]
+    ).drop_duplicates(subset=["ticker"], keep="first")
+
+    # Create a mapping dictionary: {ticker: latest company name}
+    comp_name_mapped_dict = dict(
+        zip(ticker_latest_company_df["ticker"], ticker_latest_company_df["comp_name"])
+    )
+
+    # Update 'comp_name' in df using the mapping dictionary
+    df.loc[:, "comp_name"] = df["ticker"].map(comp_name_mapped_dict)
+
+
+def companies_with_multiple_tickers(df: pd.DataFrame) -> list:
+    """
+    Identifies companies associated with multiple tickers in the given DataFrame.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame containing 'comp_name' and 'ticker' columns.
+
+    Returns:
+    list: A list of strings, where each string contains a company name and its associated tickers.
+    """
+
+    # Group by company name and count unique tickers
+    tickers_per_company_df = (
+        df.groupby("comp_name")["ticker"].nunique().sort_values(ascending=False)
+    )
+
+    # Filter to keep only companies associated with multiple tickers
+    companies_with_multiple_tickers_index = tickers_per_company_df[
+        tickers_per_company_df > 1
+    ].index
+
+    # Get DataFrame of companies with multiple tickers
+    companies_multi_ticker_df = df[
+        df["comp_name"].isin(companies_with_multiple_tickers_index)
+    ]
+
+    # Build the list of companies and associated tickers
+    companies_multi_ticker_list = []
+    for company, other_cols in companies_multi_ticker_df.groupby("comp_name"):
+        tickers = ", ".join(sorted(other_cols["ticker"].unique()))
+        companies_multi_ticker_list.append(f"{company}: {tickers}")
+
+    print(
+        "Companies associated with multiple tickers: ",
+        len(companies_with_multiple_tickers_index),
+        end="\n\n",
+    )
+
+    return companies_multi_ticker_list
+
+
 def test_company(df: pd.DataFrame, company: str) -> pd.DataFrame:
     """
     Filter a DataFrame to return all rows associated with a specific company.
@@ -59,7 +161,42 @@ def test_company(df: pd.DataFrame, company: str) -> pd.DataFrame:
     return df[df["comp_name"] == company]
 
 
+import pandas as pd
+
+
+def apply_most_recent_ticker(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Assigns the most recent ticker to each company based on the latest available year.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing 'comp_name', 'year', and 'ticker' columns.
+
+    Returns:
+    pd.DataFrame: Updated DataFrame with the most recent ticker applied.
+    """
+    # Ensure necessary columns exist
+    required_columns = {"comp_name", "year", "ticker"}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"DataFrame must contain columns: {required_columns}")
+
+    # Sort by company name and year (descending to get the latest first)
+    company_latest_ticker_df = df.sort_values(
+        by=["comp_name", "year"], ascending=[True, False]
+    ).drop_duplicates(subset=["comp_name"], keep="first")
+
+    # Create a mapping of company name to the latest ticker
+    ticker_mapping = dict(
+        zip(company_latest_ticker_df["comp_name"], company_latest_ticker_df["ticker"])
+    )
+
+    # Map the most recent ticker back to the original dataframe
+    df.loc[:, "ticker"] = df["comp_name"].map(ticker_mapping)
+
+    # return df
+
+
 from typing import Optional, Dict, List, Any
+
 
 def test_filter(
     df: pd.DataFrame,
@@ -145,14 +282,14 @@ from typing import Optional
 from rapidfuzz import fuzz, process
 
 
-def find_similar_entries(input_df: pd.DataFrame, threshold: int = 75) -> pd.DataFrame:
+def find_similar_entries(df: pd.DataFrame, threshold: int = 75) -> pd.DataFrame:
     """
     Identifies pairs of similar entries based on a combination of 'comp_name' and 'ticker',
     ensuring that the first two characters of 'comp_name' are the same. The function also
     includes the corresponding year for each entry.
 
     Parameters:
-        input_df (pd.DataFrame): The input DataFrame containing 'comp_name', 'ticker', and 'year' columns.
+        df (pd.DataFrame): The input DataFrame containing 'comp_name', 'ticker', and 'year' columns.
         threshold (int, optional): The similarity score threshold (default is 75). Pairs must meet or exceed
             this score to be included.
 
@@ -164,12 +301,12 @@ def find_similar_entries(input_df: pd.DataFrame, threshold: int = 75) -> pd.Data
             - 'year2': Corresponding year for entry2.
             - 'similarity': Similarity score between the two entries.
     """
-    input_df = input_df.copy()
+    input_df = df.copy()
 
-    # Create a combined column of company name and ticker
+    # Combine columns for a more robust measure of similarity
     input_df["combined"] = input_df["comp_name"] + " (" + input_df["ticker"] + ")"
 
-    # Store the most recent year for each combined entry
+    # If two similar entries are the same company, keep the one with the most recent year
     year_lookup = input_df.groupby("combined")["year"].max().to_dict()
 
     # Get unique combined values
@@ -179,10 +316,14 @@ def find_similar_entries(input_df: pd.DataFrame, threshold: int = 75) -> pd.Data
     # Compare each unique value to others
     for i, value in enumerate(unique_values):
         matches = process.extract(
-            value, unique_values[i + 1 :], scorer=fuzz.ratio, limit=None
+            # [i + 1 :] to avoid comparing to itself
+            value,
+            unique_values[i + 1 :],
+            scorer=fuzz.ratio,
+            limit=None,
         )
         for match_value, score, _ in matches:
-            # Lookup precomputed years for both entries
+            # Lookup precomputed years for both entries; return None if not found
             year1 = year_lookup.get(value, None)
             year2 = year_lookup.get(match_value, None)
 
@@ -198,10 +339,156 @@ def find_similar_entries(input_df: pd.DataFrame, threshold: int = 75) -> pd.Data
     # Drop the temporary 'combined' column
     input_df.drop(columns=["combined"], inplace=True)
 
-    return (
+    output_df = (
         pd.DataFrame(
             similar_pairs, columns=["entry1", "year1", "entry2", "year2", "similarity"]
         )
         .sort_values(by="similarity", ascending=False)
         .reset_index(drop=True)
     )
+
+    return output_df
+
+
+def map_similar_pairs(
+    input_df: pd.DataFrame,
+    output_df: pd.DataFrame,
+    indices_to_keep: Optional[List[int]] = None,
+) -> pd.DataFrame:
+    """
+    Merges similar company names in `output_df` using mappings from `input_df`.
+
+    Parameters:
+    -----------
+    input_df : pd.DataFrame
+        A DataFrame containing columns `entry1` and `entry2`, where `entry1` is the preferred name/ticker.
+    output_df : pd.DataFrame
+        The target DataFrame where name and ticker replacements will be applied.
+    indices_to_keep : Optional[List[int]], default=None
+        A list of row indices from `input_df` to use for mapping. If None, all rows are used.
+
+    Returns:
+    --------
+    pd.DataFrame
+        A modified version of `output_df` with corrected `comp_name` and `ticker` values.
+    """
+
+    # If indices_to_keep is specified, filter the input_df
+    if indices_to_keep is not None:
+        input_df = input_df.loc[indices_to_keep]
+
+    # Extract company names and tickers from 'entry1' and 'entry2' columns
+    input_df[["comp_name1", "ticker1"]] = input_df["entry1"].str.extract(
+        r"^(.*) \((.*)\)$"
+    )
+    input_df[["comp_name2", "ticker2"]] = input_df["entry2"].str.extract(
+        r"^(.*) \((.*)\)$"
+    )
+
+    # Create mappings for replacement
+    comp_name_mapping = dict(zip(input_df["comp_name2"], input_df["comp_name1"]))
+    ticker_mapping = dict(zip(input_df["ticker2"], input_df["ticker1"]))
+
+    # Apply replacements to the output DataFrame
+    output_df["comp_name"] = output_df["comp_name"].map(lambda row: comp_name_mapping.get(row, row))
+    output_df["ticker"] = output_df["ticker"].map(lambda row: ticker_mapping.get(row, row))
+
+
+def update_segments_remove_na(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Updates the 'segment' column in the given DataFrame based on the most recent valid segment
+    for companies with missing segment information.
+
+    Parameters:
+    df (pd.DataFrame): Input DataFrame containing 'comp_name', 'segment', and 'year' columns.
+
+    Returns:
+    pd.DataFrame: Updated DataFrame with missing segment values replaced.
+    """
+
+    valid_segments: list[str] = ["Mid", "Large", "Small"]
+
+    # Identify companies with missing segment information
+    companies_missing_segments: np.ndarray = df[
+        df["segment"].isin(["ND", "0", np.nan])
+    ]["comp_name"].unique()
+
+    most_recent_segments: Dict[str, str] = (
+        df[
+            df["comp_name"].isin(companies_missing_segments)
+            & df["segment"].isin(valid_segments)
+        ]
+        .dropna(subset=["segment", "year"])
+        .sort_values(by="year", ascending=False)
+        .groupby("comp_name")
+        .first()["segment"]
+        .to_dict()
+    )
+
+    # Update the 'segment' column using the most recent valid segment if applicable
+    df["segment"] = df.apply(
+        lambda row: (
+            most_recent_segments.get(row["comp_name"], row["segment"])
+            if row["segment"] in ["ND", "0", np.nan]
+            else row["segment"]
+        ),
+        axis=1,
+    )
+
+
+def get_most_recent_values(
+    df: pd.DataFrame,
+    invalid_values: List[str] = ["ND"],
+    columns_to_update: List[str] = ["segment", "industry", "hq_country"],
+    sort_column: str = "year",
+) -> pd.DataFrame:
+    """
+    Updates a DataFrame by replacing specified columns with the most recent valid value per company.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame containing historical data.
+        invalid_values (List[str], optional): A list of invalid values to be ignored. Defaults to ["ND"].
+        columns_to_update (List[str], optional): Columns to update with the most recent valid values.
+        sort_column (str, optional): The column used for sorting records (e.g., "year"). Defaults to "year".
+
+    Returns:
+        pd.DataFrame: A DataFrame with updated columns containing the most recent valid values.
+    """
+
+    def get_most_recent_valid_data(group: pd.DataFrame, column: str) -> str:
+        valid_data = group[~(group[column].isin(invalid_values) | group[column].isna())]
+        if not valid_data.empty:
+            return valid_data.iloc[0][column]  # Most recent valid value
+        return "Unknown"  # Default fallback
+
+    most_recent_data = {
+        comp_name: {
+            col: get_most_recent_valid_data(group, col) for col in columns_to_update
+        }
+        for comp_name, group in df.sort_values(by=sort_column, ascending=False).groupby(
+            "comp_name"
+        )
+    }
+
+    for col in columns_to_update:
+        df[col] = df["comp_name"].map(lambda x: most_recent_data[x][col])
+
+
+def generate_binary_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Generate a summary DataFrame with column names, data types, and counts of 1s and 0s.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame to summarize.
+
+    Returns:
+        pd.DataFrame: A DataFrame summarizing the column names, data types, and counts of 1s and 0s.
+    """
+    summary_df = pd.DataFrame(
+        {
+            "Column Name": df.columns,
+            "Data Type": [df[col].dtype for col in df.columns],
+            "1s": [(df[col] == 1).sum() for col in df.columns],
+            "0s": [(df[col] == 0).sum() for col in df.columns],
+        }
+    )
+    return summary_df
