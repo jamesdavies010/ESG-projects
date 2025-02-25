@@ -489,6 +489,7 @@ def generate_binary_summary(df: pd.DataFrame) -> pd.DataFrame:
             "Data Type": [df[col].dtype for col in df.columns],
             "1s": [(df[col] == 1).sum() for col in df.columns],
             "0s": [(df[col] == 0).sum() for col in df.columns],
+            "NaNs": [df[col].isna().sum() for col in df.columns],
         }
     )
     return summary_df
