@@ -12,5 +12,10 @@ from .data_cleaning_functions import (
     map_similar_pairs,
     update_segments_remove_na,
     get_most_recent_values,
-    generate_binary_summary
+    generate_binary_summary,
+)
+from .eda_functions import (
+    chart_visualisations,
+    summarise_boolean_values,
+    parameters_by_year,
 )
