@@ -181,7 +181,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-def parameters_by_year(
+def visualisations_by_year(
     df: pd.DataFrame, columns_to_include: list, display_mode: str = "percentage"
 ) -> go.Figure:
     """
@@ -203,10 +203,11 @@ def parameters_by_year(
     go.Figure
         A Plotly figure displaying stacked bar charts for each parameter over time.
     """
+    display_mode = display_mode.lower()
 
     # Exclude columns that should not be visualized
     exclude_columns = {}
-    
+
     relevant_columns = [
         col
         for col in columns_to_include
@@ -223,7 +224,7 @@ def parameters_by_year(
     binary_columns = [
         col
         for col in relevant_columns
-        if df[col].nunique() == 2 and sorted(df[col].unique()) == [0, 1]
+        if sorted(df[col].dropna().unique()) == [0, 1]
     ]
 
     # Create subplot layout
@@ -231,30 +232,33 @@ def parameters_by_year(
     n_rows = -(-len(relevant_columns) // n_cols)
     fig = make_subplots(rows=n_rows, cols=n_cols, subplot_titles=relevant_columns)
 
+    colour_map = {
+        0: "rgb(254,240,205)",
+        1: "rgb(6,212,124)",
+    }
+
     for idx, col in enumerate(relevant_columns):
         row_num = (idx // n_cols) + 1
         col_num = (idx % n_cols) + 1
 
-        # Aggregate counts per year per category
+        # Aggregate counts per year per category_or_boolean
         grouped_data = df.groupby(["year", col]).size().unstack(fill_value=0)
 
         if display_mode == "percentage":
             grouped_data = grouped_data.div(grouped_data.sum(axis=1), axis=0) * 100
 
-        # Assign colors (binary columns get green/beige, others get default)
-        if col in binary_columns:
-            colors = ["rgb(6,212,124)", "rgb(254,240,205)"]  # Green for 1, Beige for 0
-        else:
-            colors = None  # Default Plotly colors
+        categories = sorted(
+            grouped_data.columns, reverse=True if col in binary_columns else False
+        )
 
-        # Add traces for each unique category
-        for i, category in enumerate(grouped_data.columns):
+        # Add traces for each unique category_or_boolean
+        for category_or_boolean in categories:
             fig.add_trace(
                 go.Bar(
                     x=grouped_data.index.astype(str),
-                    y=grouped_data[category],
-                    name=f"{category}",
-                    marker=dict(color=colors[i] if colors else None),
+                    y=grouped_data[category_or_boolean],
+                    name=f"{category_or_boolean}",
+                    marker=dict(color=colour_map.get(category_or_boolean) if col in binary_columns else None),
                     showlegend=False,
                 ),
                 row=row_num,
@@ -269,6 +273,15 @@ def parameters_by_year(
         barmode="stack",
         height=400 * n_rows,
         width=1200,
+        title={
+            "text": f"""
+            <span style='color: {colour_map[1]};'>Reported (1)</span><span style='color: black;'> | </span><span style='color: {colour_map[0]};'>Not reported (0)</span>
+            """,
+            "x": 0.5,
+            "y": 0.995,
+            "xanchor": "center",
+            "yanchor": "top",
+        },
         template="plotly_white",
         showlegend=False,
         yaxis=dict(title=yaxis_title, tickformat=tick_format),

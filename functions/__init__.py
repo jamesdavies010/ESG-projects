@@ -17,5 +17,5 @@ from .data_cleaning_functions import (
 from .eda_functions import (
     chart_visualisations,
     summarise_boolean_values,
-    parameters_by_year,
+    visualisations_by_year,
 )
