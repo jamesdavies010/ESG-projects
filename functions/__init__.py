@@ -19,3 +19,6 @@ from .eda_functions import (
     summarise_boolean_values,
     visualisations_by_year,
 )
+from .scoring_functions import (
+    calculate_industry_weights,
+)
