@@ -1,0 +1,42 @@
+company,ticker,year,csrd_2025,csrd_2027,segment,industry,hq_country,years_esg_data,base_year,external_audit_of_ESG_report,ceo_sust_statem,environmental_policy_and_assessment,environmental_performance_targets,reduced_environmental_impact,increased_renewable_energy,disclosure_of_raw_material_use,resource_efficiency_target,disclosure_of_water_discharges,supplier_guidelines,disclosure_of_suppliers_audited,disclosure_of_supplier_evaluation_procedures,supplier_environmental_assessment,energy_consump_bool,water_withdraw_bool,ghg_emis_bool,transport_emis_bool
+Archer Ltd.,ARCHO,2020,1,0,Mid,Energy and Utilities,Norway,1,2020,1,1,1,1,1,0,0,1,0,1,1,0,0,1,0,0,0
+Avance Gas Holding ltd,AGAS,2020,0,0,Mid,Energy and Utilities,Norway,2,2019,1,1,1,1,1,0,0,1,0,1,0,0,0,1,0,0,0
+Borr Drilling Ltd,BDRILL,2020,0,1,Mid,Energy and Utilities,Bermuda,4,2019,0,1,1,1,1,0,0,1,0,1,1,1,1,1,0,1,0
+BW LPG,BWLPG,2020,1,0,Large,Energy and Utilities,Bermuda,4,2019,0,1,1,1,1,0,0,1,0,1,1,1,1,1,0,0,0
+BW Offshore Limited,BWO,2020,1,0,Large,Energy and Utilities,Bermuda,4,2019,0,1,1,1,1,0,0,1,1,1,0,0,1,1,0,0,0
+FLEX LNG Ltd,FLNG,2020,0,0,Large,Energy and Utilities,"Virgin Islands, British",4,2019,0,1,1,1,1,0,0,1,0,0,0,0,0,1,0,1,0
+Frontline Ltd,FRO,2020,0,1,Large,Energy and Utilities,Bermuda,4,2019,0,1,1,1,1,0,0,1,0,1,0,0,0,1,0,1,0
+Höegh LNG Holdings,HLNG,2020,0,1,Mid,Energy and Utilities,Bermuda,2,2019,0,1,1,1,1,0,0,1,0,1,1,0,1,1,0,1,0
+Northern Drilling Ltd,NODL,2020,0,0,Mid,Energy and Utilities,Bermuda,1,2020,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Odfjell Drilling Ltd,ODL,2020,1,0,Mid,Energy and Utilities,Bermuda,4,2019,0,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,0
+Seadrill Ltd,SDRL,2020,1,0,Small,Energy and Utilities,Bermuda,3,2019,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+Africa Oil Corp.,AOI,2020,0,0,Mid,Energy and Utilities,Canada,3,2019,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0
+International Petroleum Corp.,IPCO,2020,0,1,Mid,Energy and Utilities,Canada,4,2019,0,1,1,1,1,0,0,1,1,0,0,0,0,1,1,1,1
+Questerre Energy Corporation,QEC,2020,0,0,Large,Energy and Utilities,Canada,3,2019,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+Ørsted A/S,ORSTED,2020,1,0,Large,Energy and Utilities,Denmark,4,2019,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1
+The Drilling Company of 1972 A/S,DRLCO,2020,0,0,Large,Energy and Utilities,Denmark,4,2019,0,1,1,1,1,0,0,1,0,1,1,1,1,1,1,1,0
+Vestas Wind Systems A/S,VWS,2020,1,0,Large,Energy and Utilities,Denmark,4,2019,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1
+Fortum Oyj,FORTUM,2020,1,0,Large,Energy and Utilities,Finland,4,2019,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+Neste Oyj,NESTE,2020,1,0,Large,Energy and Utilities,Finland,4,2019,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+EnQuest plc,ENQ,2020,0,1,Mid,Energy and Utilities,United Kingdom,4,2019,0,1,1,1,1,0,0,1,0,1,0,0,1,1,0,1,0
+RAK Petroleum plc,RAKP,2020,0,0,Mid,Energy and Utilities,United Kingdom,4,2019,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Shelf Drilling Ltd,SHLFO,2020,1,0,Mid,Energy and Utilities,United Arab Emirates,1,2020,0,1,1,1,1,0,0,1,0,1,0,0,1,1,0,1,1
+Siem Offshore Inc.,SIOFF,2020,1,0,Large,Energy and Utilities,Cayman Islands,3,2019,0,0,1,1,1,0,0,1,0,1,0,0,1,0,0,0,0
+Subsea 7 S.A.,SUBC,2020,1,0,Large,Energy and Utilities,Luxembourg,4,2019,0,1,1,1,1,0,0,1,0,1,1,1,1,1,0,1,1
+Tanker Investments Ltd,TNK,2020,1,0,Mid,Energy and Utilities,Bermuda,1,2020,0,1,1,1,1,0,0,1,0,0,1,0,0,1,0,0,0
+Fjordkraft Holding ASA,FKRAFT,2020,0,1,Mid,Energy and Utilities,Norway,2,2019,0,1,1,1,1,0,0,1,0,1,0,1,0,1,0,1,1
+TGS-NOPEC Geophysical Company ASA,TGS,2020,0,1,Mid,Energy and Utilities,Norway,4,2019,0,1,1,1,1,0,0,1,0,1,0,1,1,0,0,1,1
+Solstad Farstad ASA (formerly Farstad Shipping),SOFF,2020,1,0,Mid,Energy and Utilities,Norway,1,2020,1,1,1,1,1,0,0,1,1,0,0,0,0,1,0,1,0
+Arendals Fossekompani ASA,AFK,2020,1,0,Large,Energy and Utilities,Norway,4,2019,0,1,1,1,1,0,0,1,0,1,0,0,1,1,0,1,1
+DNO ASA,DNO,2020,1,0,Mid,Energy and Utilities,Norway,4,2019,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+DOF ASA,DOFO,2020,1,0,Mid,Energy and Utilities,Norway,1,2020,1,1,1,1,0,0,0,1,0,1,1,0,1,0,0,1,0
+Equinor ASA (formerly Statoil ASA),EQNR,2020,1,0,Large,Energy and Utilities,Norway,4,2019,1,1,1,1,1,0,0,1,1,1,0,0,1,1,1,1,1
+Petroleum Geo-Services ASA,PGS,2020,0,1,Small,Energy and Utilities,Norway,3,2019,0,1,1,1,1,0,0,1,0,1,1,0,1,1,0,0,0
+Akastor  ASA,AKAST,2020,1,0,Mid,Energy and Utilities,Norway,2,2019,0,1,1,1,1,0,0,0,0,1,1,0,1,1,0,1,1
+Aker BP ASA,AKRBP,2020,1,0,Large,Energy and Utilities,Norway,4,2019,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1
+Norwegian Energy Company ASA,NOR,2020,0,1,Mid,Energy and Utilities,Norway,4,2019,0,0,1,1,1,0,0,1,1,0,0,0,0,1,0,1,0
+Ocean Yield ASA,OCYO,2020,0,1,Mid,Energy and Utilities,Norway,2,2019,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1
+Aker Solutions ASA,AKSO,2020,1,0,Large,Energy and Utilities,Norway,4,2019,0,1,1,1,1,0,0,1,0,1,1,1,1,1,0,1,1
+Prosafe SE,PRS,2020,0,1,Large,Energy and Utilities,Cyprus,4,2019,0,0,1,1,1,0,0,1,0,1,1,1,1,1,1,0,0
+Lundin Energy AB,LUNE,2020,0,1,Large,Energy and Utilities,Sweden,4,2019,1,1,1,1,1,1,0,1,1,1,0,0,1,1,1,1,1
+Tethys Oil AB,TETY,2020,0,1,Mid,Energy and Utilities,Sweden,4,2019,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0
