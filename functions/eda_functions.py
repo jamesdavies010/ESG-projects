@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from typing import Optional
 
 
 def chart_visualisations(
@@ -288,3 +289,85 @@ def visualisations_by_year(
     )
 
     return fig
+
+
+def map_ceo_statements(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Maps 'ceo_sust_statem' values from year 2021 onto year 2022 for the same company.
+    If no 2021 value exists, the original 2022 value remains unchanged.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing 'company', 'year', and 'ceo_sust_statem' columns.
+
+    Returns:
+    pd.DataFrame: Updated DataFrame with 2022 values replaced by corresponding 2021 values where applicable.
+    """
+
+    # Create a mapping of 'company' to 'ceo_sust_statem' for 2021
+    ceo_statements_2021 = df[df["year"] == 2021][
+        ["company", "ceo_sust_statem"]
+    ].set_index("company")["ceo_sust_statem"]
+
+    # Ensure only 2022 rows are updated
+    mask_2022 = df["year"] == 2022
+
+    # Map values and keep original 2022 values where no 2021 data exists
+    df.loc[mask_2022, "ceo_sust_statem"] = (
+        df.loc[mask_2022, "company"]
+        .map(ceo_statements_2021)
+        .combine_first(df.loc[mask_2022, "ceo_sust_statem"])
+    )
+
+    return df
+
+
+def top_n_companies(
+    df: pd.DataFrame,
+    sort_by: str,
+    n_companies: int = 20,
+    industry: Optional[str] = None,
+    year: Optional[int] = None,
+    hq_country: Optional[str] = None,
+    segment: Optional[str] = None,
+) -> pd.DataFrame:
+    """
+    Returns the top n companies based on a specified column.
+
+    Parameters:
+    df (pd.DataFrame): The reporting DataFrame.
+    sort_by (str): Column to sort by (required).
+    n_companies (int): Number of top companies to return (default = 20).
+    industry (Optional[str]): Industry to filter by (default = None, includes all industries).
+    year (Optional[int]): Year to filter by (default = None, includes all years).
+    hq_country (Optional[str]): HQ country to filter by (default = None, includes all countries).
+    segment (Optional[str]): Segment to filter by (default = None, includes all segments).
+
+    Returns:
+    pd.DataFrame: Top n companies sorted by the specified column.
+    """
+
+    # Ensure the sort_by column exists in the DataFrame
+    if sort_by not in df.columns:
+        raise ValueError(f"Column '{sort_by}' not found in DataFrame.")
+
+    # Create a filtered DataFrame based on user input
+    filtered_df = df.copy()
+
+    if industry is not None:
+        filtered_df = filtered_df[filtered_df["industry"] == industry]
+
+    if year is not None:
+        filtered_df = filtered_df[filtered_df["year"] == year]
+
+    if hq_country is not None:
+        filtered_df = filtered_df[filtered_df["hq_country"] == hq_country]
+
+    if segment is not None:
+        filtered_df = filtered_df[filtered_df["segment"] == segment]
+
+    # Sort by the specified column in descending order
+    top_companies = filtered_df.sort_values(by=sort_by, ascending=True).head(
+        n_companies
+    )
+
+    return top_companies

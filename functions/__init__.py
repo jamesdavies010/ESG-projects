@@ -18,7 +18,13 @@ from .eda_functions import (
     chart_visualisations,
     summarise_boolean_values,
     visualisations_by_year,
+    map_ceo_statements
 )
 from .scoring_functions import (
     calculate_industry_weights,
+    calculate_company_percentiles,
+    calculate_raw_score,
+    calculate_adjusted_score,
+    assign_rating,
+    cast_to_rating_category,
 )

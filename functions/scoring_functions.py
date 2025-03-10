@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-from typing import List
+from typing import List, Union
+from pandas.api.types import CategoricalDtype
 
 
 def calculate_industry_weights(df, scoring_cols):
@@ -95,3 +96,182 @@ def calculate_company_percentiles(
         f"{col}_percentile" for col in scoring_cols
     ]
     return company_percentiles[cols]
+
+
+import numpy as np
+import pandas as pd
+from typing import List
+
+
+def calculate_raw_score(
+    company_percentiles_df: pd.DataFrame,
+    materiality_weights_df: pd.DataFrame,
+    scoring_cols: List[str],
+    by_industry: bool = True,
+) -> pd.DataFrame:
+    """
+    Calculate a company's weighted raw score based on percentile scores and materiality weights.
+
+    Parameters:
+    - company_percentiles_df (pd.DataFrame): DataFrame with company percentile scores per metric.
+    - materiality_weights_df (pd.DataFrame): DataFrame with materiality weights per metric.
+    - scoring_cols (List[str]): List of columns to be used for scoring.
+    - by_industry (bool, optional): Whether to apply industry-specific weights (default=True).
+                                    If False, a single weight per metric is used.
+
+    Returns:
+    - pd.DataFrame: A DataFrame with weighted scores and an overall raw score for each company.
+    """
+    weighted_scores_df = company_percentiles_df.copy()
+    score_cols = []
+
+    for col in scoring_cols:
+        weight_col = f"{col}_materiality_weight"
+        score_col = f"{col}_score"
+
+        if by_industry:
+            # Map industry-specific materiality weights
+            weighted_scores_df[score_col] = weighted_scores_df.apply(
+                lambda row: (
+                    row[f"{col}_percentile"]
+                    * materiality_weights_df.loc[row["industry"], weight_col]
+                    if row["industry"] in materiality_weights_df.index
+                    else np.nan
+                ),
+                axis=1,
+            )
+        else:
+            # Ensure the weights DataFrame is transposed correctly
+            if "metric_materiality" in materiality_weights_df.index:
+                if col in materiality_weights_df.columns:
+                    global_weight = materiality_weights_df.loc[
+                        "metric_materiality", col
+                    ]
+                    weighted_scores_df[score_col] = (
+                        weighted_scores_df[f"{col}_percentile"] * global_weight
+                    )
+                else:
+                    weighted_scores_df[score_col] = np.nan  # Handle missing metric
+            else:
+                weighted_scores_df[score_col] = (
+                    np.nan
+                )  # Handle case where row is missing
+
+        score_cols.append(score_col)
+
+    # Define the correct output column name
+    score_col_name = "industry_score_raw" if by_industry else "overall_score_raw"
+
+    # Compute overall raw score as the sum of all individual scores
+    weighted_scores_df[score_col_name] = weighted_scores_df[score_cols].sum(axis=1)
+
+    return weighted_scores_df[
+        ["company", "ticker", "year", "industry", score_col_name] + score_cols
+    ]
+
+
+def calculate_adjusted_score(df, raw_column, by_industry=True):
+    """
+    Calculates the percentile ranking of each company's environmental score relative to
+    other companies in the same industry and year.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame containing company data.
+        raw_column (str): The column name for the raw environmental score.
+        by_industry (bool): If True, percentiles are calculated within industry-year groups.
+
+    Returns:
+        pd.DataFrame: The DataFrame with an additional column for percentiles.
+    """
+    result_dfs = []
+
+    # Group by industry and year if by_industry is True; otherwise, group only by year
+    groupby_cols = ["industry", "year"] if by_industry else ["year"]
+
+    adjusted_score_col = (
+        "industry_score_adjusted" if by_industry else "overall_score_adjusted"
+    )
+
+    for _, group in df.groupby(groupby_cols):
+        group_copy = group.copy()
+        total_count = len(group_copy)
+
+        if total_count > 0:
+            group_copy[adjusted_score_col] = group_copy[raw_column].apply(
+                lambda x: (
+                    0
+                    if x == 0
+                    else (
+                        (
+                            (group_copy[raw_column] < x).sum()
+                            + (group_copy[raw_column] == x).sum() / 2
+                        )
+                        / total_count
+                    )
+                )
+            )
+
+        result_dfs.append(group_copy)
+
+    # Concatenate results and return only relevant columns
+    final_df = pd.concat(result_dfs, ignore_index=True)
+
+    # selected_cols = [
+    #     "company",
+    #     "ticker",
+    #     "year",
+    #     "industry",
+    #     "adjusted_industry_score",
+    # ]
+
+    return final_df
+
+
+import pandas as pd
+from pandas.api.types import CategoricalDtype
+
+
+def assign_rating(percentile: float) -> str:
+    """
+    Assigns a rating (A+ to D-) based on the given percentile.
+    Returns a plain string. We will convert it to a categorical later.
+    """
+    rating_order = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-"]
+
+    # Assign rating based on percentile
+    if 0.92 < percentile <= 1:
+        return "A+"
+    elif 0.83 < percentile <= 0.92:
+        return "A"
+    elif 0.75 < percentile <= 0.83:
+        return "A-"
+    elif 0.67 < percentile <= 0.75:
+        return "B+"
+    elif 0.58 < percentile <= 0.67:
+        return "B"
+    elif 0.50 < percentile <= 0.58:
+        return "B-"
+    elif 0.42 < percentile <= 0.50:
+        return "C+"
+    elif 0.33 < percentile <= 0.42:
+        return "C"
+    elif 0.25 < percentile <= 0.33:
+        return "C-"
+    elif 0.17 < percentile <= 0.25:
+        return "D+"
+    elif 0.08 < percentile <= 0.17:
+        return "D"
+    elif 0.0 <= percentile <= 0.08:
+        return "D-"
+    else:
+        return "Invalid percentile"
+
+
+def cast_to_rating_category(series: pd.Series) -> pd.Series:
+    """
+    Converts a string-based rating Series into an ordered categorical
+    with the same rating order used above, so we only define it once.
+    """
+    rating_order = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-"]
+    dtype = CategoricalDtype(categories=rating_order, ordered=True)
+    return series.astype(dtype)
