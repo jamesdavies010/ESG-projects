@@ -9,7 +9,7 @@ def calculate_industry_weights(df, scoring_cols):
     Calculate industry-level materiality weights for ESG scoring.
 
     Parameters:
-    - reporting_df (pd.DataFrame): The ESG dataset containing company data.
+    - df (pd.DataFrame): The ESG dataset containing company data.
     - scoring_cols (list): List of columns to be used for scoring.
 
     Returns:
