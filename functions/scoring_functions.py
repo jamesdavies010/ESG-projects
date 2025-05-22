@@ -92,7 +92,7 @@ def calculate_company_percentiles(
     company_percentiles = pd.concat(result_dfs, ignore_index=True)
 
     # Select and order the desired columns
-    cols = ["company", "ticker", "year", "industry"] + [
+    cols = ["company", "ticker", "year", "hq_country", "revenue_MEUR", "industry"] + [
         f"{col}_percentile" for col in scoring_cols
     ]
     return company_percentiles[cols]
@@ -166,7 +166,16 @@ def calculate_raw_score(
     weighted_scores_df[score_col_name] = weighted_scores_df[score_cols].sum(axis=1)
 
     return weighted_scores_df[
-        ["company", "ticker", "year", "industry", score_col_name] + score_cols
+        [
+            "company",
+            "ticker",
+            "year",
+            "hq_country",
+            "revenue_MEUR",
+            "industry",
+            score_col_name,
+        ]
+        + score_cols
     ]
 
 
