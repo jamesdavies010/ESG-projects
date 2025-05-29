@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from typing import Optional, Dict, List, Any
+from rapidfuzz import fuzz, process
 
 # note to self: probably not a good idea to hardcode columns like this, because I edit the column names later in my notebook.
 # in fact, all edits of column names should be done at the beginning of the file.
