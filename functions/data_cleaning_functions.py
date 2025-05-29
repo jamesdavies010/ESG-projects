@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
-from typing import List
+from typing import Optional, Dict, List, Any
 
+# note to self: probably not a good idea to hardcode columns like this, because I edit the column names later in my notebook.
+# in fact, all edits of column names should be done at the beginning of the file.
 def display_unique_counts(df: pd.DataFrame) -> None:
     """
     Display the unique counts of companies and tickers in a DataFrame.
@@ -38,9 +40,6 @@ def test_ticker(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
         pd.DataFrame: A filtered DataFrame containing only rows where the 'ticker' column matches the specified value.
     """
     return df[df["ticker"] == ticker]
-
-
-import pandas as pd
 
 
 def tickers_with_multiple_companies(df: pd.DataFrame) -> list:
@@ -161,9 +160,6 @@ def test_company(df: pd.DataFrame, company: str) -> pd.DataFrame:
     return df[df["comp_name"] == company]
 
 
-import pandas as pd
-
-
 def apply_most_recent_ticker(df: pd.DataFrame) -> pd.DataFrame:
     """
     Assigns the most recent ticker to each company based on the latest available year.
@@ -193,9 +189,6 @@ def apply_most_recent_ticker(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[:, "ticker"] = df["comp_name"].map(ticker_mapping)
 
     # return df
-
-
-from typing import Optional, Dict, List, Any
 
 
 def test_filter(
@@ -236,9 +229,6 @@ def test_filter(
     return df if rows_to_show is None else df.head(rows_to_show)
 
 
-import pandas as pd
-
-
 def show_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     """
     Display missing values and their percentages for each column in a DataFrame.
@@ -275,11 +265,6 @@ def show_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return missing_summary
-
-
-import pandas as pd
-from typing import Optional
-from rapidfuzz import fuzz, process
 
 
 def find_similar_entries(df: pd.DataFrame, threshold: int = 75) -> pd.DataFrame:
