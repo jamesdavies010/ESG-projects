@@ -5,6 +5,7 @@ from rapidfuzz import fuzz, process
 
 # note to self: probably not a good idea to hardcode columns like this, because I edit the column names later in my notebook.
 # in fact, all edits of column names should be done at the beginning of the file.
+
 def display_unique_counts(df: pd.DataFrame) -> None:
     """
     Display the unique counts of companies and tickers in a DataFrame.
